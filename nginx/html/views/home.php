@@ -67,9 +67,9 @@ function checkNodes(range, selectText){
         }else if(range.compareBoundaryPoints(Range.START_TO_START, nodeRange) > 0 &&
             range.compareBoundaryPoints(Range.END_TO_END, nodeRange) < 0) {
             console.log('rangeがノードに囲まれている。');
-            let df = range.extractContents();
-            let textNode = document.createTextNode("</b>" +selectText + "<b>");
-            range.insertNode(textNode);
+            // let df = range.extractContents();
+            // let textNode = document.createTextNode("</b>" +selectText + "<b>");
+            // range.insertNode(textNode);
             return false;
             }
         else {
