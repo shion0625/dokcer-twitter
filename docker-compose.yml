@@ -1,0 +1,52 @@
+version: "3"
+services:
+  db:
+    image: mysql:5.7
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --default-time-zone=Asia/Tokyo
+
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE=twitter
+      - MYSQL_USER=kaito
+      - MYSQL_PASSWORD=kaito
+      - MYSQL_ROOT_PASSWORD=kaito_twitter
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    ports: ["8888:80"]
+    depends_on: ["db"]
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./php/php.ini:/usr/local/etc/php/conf.d/php.ini
+    depends_on: ["db"]
+    environment:
+      TZ: Asia/Tokyo
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/html:/usr/share/nginx/html
+    restart: always
+    ports: ["8080:80"]
+    depends_on: ["php"]
+    environment:
+      TZ: Asia/Tokyo
+
+  node:
+    image: node:stretch
+    volumes:
+      - ./:/src
+    ports:
+      - 8000:80
+    stdin_open: true
+    tty: true
+    working_dir: /src
