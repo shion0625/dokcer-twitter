@@ -6,99 +6,94 @@ use Classes\Post\GetHomePosts;
 //データベースに投稿内容を保存
 $get_post_db = new GetHomePosts();
 $user_posts = $get_post_db->getHomePosts();
-    // header("Location: " . $_SERVER['PHP_SELF']);
 ?>
 
 <script type="text/javascript">
     const username = <?php echo json_encode($_SESSION['username']);?>;
-    const userId =<?php echo json_encode($_SESSION['userID']);?>;
+    const userId = <?php echo json_encode($_SESSION['userID']);?>;
     const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    const surroundSpan = async()=> {
+    const surroundSpan = async() => {
       let t = $('#js-post-content');
-        let nodeList =t[0].childNodes;
-        let newNodeList =[];
-        console.log(t[0]);
-        for(let i =0; i < nodeList.length; i++){
-          let element = nodeList[i];
-          if(element.tagName == "SPAN"){
-            if(element.innerHTML.length > 1){
-              let className = element.className.trim();
-              let classNameList = className.split(" ").filter(Boolean);
-              let charList = element.innerHTML.split("");
-              for(let i in charList){
-                newElement = document.createElement('span');
-                newElement.innerHTML = charList[i];
-                if(classNameList.length != 0){
-                  for(let i in classNameList){
-                    newElement.classList.add(classNameList[i]);
-                  }
-                }
-                newNodeList.push(newElement);
-              }
-            }else if(element.innerHTML.length == 0){
-              element.remove();
-            }else{
-              newNodeList.push(element);
-            }
-          }else{
-            let charList = element.data.split("");
-            for(let i in charList){
+      let nodeList = t[0].childNodes;
+      let newNodeList = [];
+      for (let i = 0; i < nodeList.length; i++) {
+        let element = nodeList[i];
+        if (element.tagName == "SPAN") {
+          if (element.innerHTML.length > 1) {
+            let className = element.className.trim();
+            let classNameList = className.split(" ").filter(Boolean);
+            let charList = element.innerHTML.split("");
+            for (let i in charList) {
               newElement = document.createElement('span');
               newElement.innerHTML = charList[i];
+              if (classNameList.length != 0) {
+                for (let i in classNameList) {
+                  newElement.classList.add(classNameList[i]);
+                }
+              }
               newNodeList.push(newElement);
             }
+          } else if (element.innerHTML.length == 0) {
+            element.remove();
+          } else {
+            newNodeList.push(element);
+          }
+        } else {
+          let charList = element.data.split("");
+          for (let i in charList) {
+            newElement = document.createElement('span');
+            newElement.innerHTML = charList[i];
+            newNodeList.push(newElement);
           }
         }
-        if(newNodeList.length !=0){
-          console.log(newNodeList);
-          t[0].innerHTML = '';
-          for(let i = newNodeList.length; i >= 0; i--){
-              t.prepend(newNodeList[i]);
-          }
+      }
+      if (newNodeList.length != 0) {
+        t[0].innerHTML = '';
+        for (let i = newNodeList.length; i >= 0; i--) {
+          t.prepend(newNodeList[i]);
         }
+      }
       return 0;
     }
-
-    async function txtChange(e){
+    async function txtChange(e) {
       let result = await surroundSpan();
-        document.querySelectorAll('[type=button][data-decoration]').forEach(x=>{
-          x.addEventListener('click',()=>{
-            const decoration=x.dataset["decoration"];
-            const sel= getSelection();
-            if(sel.focusNode!==null){
-              let start=sel.getRangeAt(0).startContainer.parentNode;
-              let end=sel.getRangeAt(0).endContainer.parentNode;
-              if(start.closest('#js-post-content') && end.closest('#js-post-content')){
-                const dom=[...sel.getRangeAt(0).cloneContents().querySelectorAll('span')];
-                const parent=end.parentNode;
-                if(dom[0].textContent==""){
-                  dom.shift();
-                }
-                if(dom[dom.length-1].textContent==""){
-                  dom.pop();
-                }else{
-                  end=end.nextElementSibling;
-                }
-                sel.deleteFromDocument() ;
-                sel.removeAllRanges();
-                dom.forEach(x=>{
-                  x.classList.toggle(decoration);
-                  parent.insertBefore(x,end);
-                });
+      document.querySelectorAll('[type=button][data-decoration]').forEach(x => {
+        x.addEventListener('click', () => {
+          const decoration = x.dataset["decoration"];
+          const sel = getSelection();
+          if (sel.focusNode !== null) {
+            let start = sel.getRangeAt(0).startContainer.parentNode;
+            let end = sel.getRangeAt(0).endContainer.parentNode;
+            if (start.closest('#js-post-content') && end.closest('#js-post-content')) {
+              const dom = [...sel.getRangeAt(0).cloneContents().querySelectorAll('span')];
+              const parent = end.parentNode;
+              if (dom[0].textContent == "") {
+                dom.shift();
               }
+              if (dom[dom.length - 1].textContent == "") {
+                dom.pop();
+              } else {
+                end = end.nextElementSibling;
+              }
+              sel.deleteFromDocument();
+              sel.removeAllRanges();
+              dom.forEach(x => {
+                x.classList.toggle(decoration);
+                parent.insertBefore(x, end);
+              });
             }
-          });
+          }
         });
-    }
-
-      $(document).on('click','.text-button',async function(e){
-        txtChange(e);
       });
+    }
+    $(document).on('click', '.text-button', async function (e) {
+      txtChange(e);
+    });
 
 const getPostContent = ()=>{
     let postText = $('#js-post-content')[0].innerHTML.toString();
-    postText = htmlentities(changeTag(returnHtmlentities(postText)));
+    postText = htmlentities(changeTag(postText));
+    console.log(postText);
     var $map = {"postText": postText, "send": "postSend", "sender": userId};
     $.ajax({
         type: 'POST',
@@ -118,8 +113,9 @@ const getPostContent = ()=>{
 
 function changeTag(str){
     console.log(str);
-    return String(str).replace(/<b>/g, "ŠtrŒÑg;")
-        .replace(/<\/b>/g,"/ŠtrŒÑg;")
+    return String(str).replace(/<span/g, "Š;")
+        .replace(/<\/span>/g,"/Š;")
+        .replace(/class="/g,"č;")
     }
 
 function returnHtmlentities(str){
