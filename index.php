@@ -1,2 +1,2 @@
 <?php
-echo 'hi';
+require '/vendor/autoload.php';
