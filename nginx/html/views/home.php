@@ -12,133 +12,89 @@ $user_posts = $get_post_db->getHomePosts();
 <script type="text/javascript">
     const username = <?php echo json_encode($_SESSION['username']);?>;
     const userId =<?php echo json_encode($_SESSION['userID']);?>;
+    const _sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    const changeStrongText = () => {
-        let selObj = getSelection();
-        if(!selObj.rangeCount){
-            return;
-        }
-        let range = selObj.getRangeAt(0);
-        let selectText = selObj.toString();
-        sanitize(range);
-        if(!$("#js-post-content").find('b').length){
-            console.log('0');
-            let boldNode = document.createElement('b');
-            let df = range.extractContents();
-            boldNode.appendChild(df);
-            range.insertNode(boldNode);
-            return;
-        }
-        checkNodes(range, selectText)
-    }
-
-    // nodeは現在調べているノード、rangeは着色したい範囲のRange
-function checkNodes(range, selectText){
-    $("#js-post-content").find('b').each(( index, node)=>{
-        // 新しいRangeを作る
-        let nodeRange = new Range();
-        // nodeRangeの範囲をnodeを囲むように設定
-        nodeRange.selectNode(node);
-
-        if(node.innerHTML.toString() == ""){
-            node.remove();
-        }
-        console.log(range.compareBoundaryPoints(Range.START_TO_START, nodeRange));
-        console.log(range.compareBoundaryPoints(Range.END_TO_END, nodeRange));
-        if (range.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0 &&
-            range.compareBoundaryPoints(Range.END_TO_END, nodeRange) >= 0){
-          // nodeRangeはrangeに囲まれている
-          // 中にあるb要素を消して全体にb要素で囲む
-            // let boldNode = document.createElement('b');
-            console.log('囲まれている');
-            let df = range.extractContents();
-            let textNode = document.createTextNode(selectText);
-            range.insertNode(textNode);
-            return false;
-        }
-        else if (range.compareBoundaryPoints(Range.START_TO_END, nodeRange) <0 ||
-            range.compareBoundaryPoints(Range.END_TO_START, nodeRange) >0){
-          // nodeRangeとrangeは重なっていない
-            console.log('重なっていない');
-            let boldNode = document.createElement('b');
-            let df = range.extractContents();
-            boldNode.appendChild(df);
-            range.insertNode(boldNode);
-        }else if(range.compareBoundaryPoints(Range.START_TO_START, nodeRange) > 0 &&
-            range.compareBoundaryPoints(Range.END_TO_END, nodeRange) < 0) {
-            console.log('rangeがノードに囲まれている。');
-            // let df = range.extractContents();
-            // let textNode = document.createTextNode("</b>" +selectText + "<b>");
-            // range.insertNode(textNode);
-            return false;
+    const surroundSpan = async()=> {
+      let t = $('#js-post-content');
+        let nodeList =t[0].childNodes;
+        let newNodeList =[];
+        console.log(t[0]);
+        for(let i =0; i < nodeList.length; i++){
+          let element = nodeList[i];
+          if(element.tagName == "SPAN"){
+            if(element.innerHTML.length > 1){
+              let className = element.className.trim();
+              let classNameList = className.split(" ").filter(Boolean);
+              let charList = element.innerHTML.split("");
+              for(let i in charList){
+                newElement = document.createElement('span');
+                newElement.innerHTML = charList[i];
+                if(classNameList.length != 0){
+                  for(let i in classNameList){
+                    newElement.classList.add(classNameList[i]);
+                  }
+                }
+                newNodeList.push(newElement);
+              }
+            }else if(element.innerHTML.length == 0){
+              element.remove();
+            }else{
+              newNodeList.push(element);
             }
-        else {
-            console.log('このノードは一部rangeに含まれている');
-          // このノードは一部rangeに含まれている
-            let df = range.extractContents();
-            let textNode = document.createTextNode(selectText);
-            range.insertNode(textNode);
-            return false;
+          }else{
+            let charList = element.data.split("");
+            for(let i in charList){
+              newElement = document.createElement('span');
+              newElement.innerHTML = charList[i];
+              newNodeList.push(newElement);
+            }
+          }
         }
-    })
-}
-
-    function sanitize(range){
-        // 開始点がテキストノードの中だったら
-        if(range.startContainer.nodeType == Node.TEXT_NODE){
-          // テキストノードをRangeの開始点の位置で2つに分ける
-            var latter = range.startContainer.splitText(range.startOffset);
-          // Rangeの開始点をテキストノードの外側にする
-            range.setStartBefore(latter);
+        if(newNodeList.length !=0){
+          console.log(newNodeList);
+          t[0].innerHTML = '';
+          for(let i = newNodeList.length; i >= 0; i--){
+              t.prepend(newNodeList[i]);
+          }
         }
-        // 終了点にも同様の処理
-        if(range.endContainer.nodeType == Node.TEXT_NODE){
-            var latter = range.endContainer.splitText(range.endOffset);
-            range.setEndBefore(latter);
-        }
+      return 0;
     }
 
-    // const getSelectText = ()=> {
-    //     let selObj = window.getSelection();
-    //     if(!selObj.rangeCount) return;
-    //     let range = selObj.getRangeAt(0);
-    //     console.log(range);
-    //     return {
-    //         range: range,
-    //         selObj: selObj
-    //     };
-    // }
-    // const changeStrongText = () => {
-    //     let {range,selObj} = getSelectText();
-    //     let postText = $('#js-post-content')[0].innerHTML.toString();
-    //     console.log($('#js-post-content').getSelection)
-    //     postText = returnHtmlentities(postText);
-    //     console.log(postText);
-    //     let RegexpF = /<b>/g;
-    //     let RegexpS = /<\/b>/g;
-    //     let result;
-    //     let boldFirst = [];
-    //     let boldSecond = [];
-    //     while (result = RegexpF.exec(postText)) {
-    //         boldFirst.push(result.index);
-    //     }
-    //     while (result = RegexpS.exec(postText)) {
-    //         boldSecond.push(result.index);
-    //     }
-    //     //Bを入れたい場所がboldF(i)とboldS(i)の間に収まるなら</b> <b>と入れる。F側に越えるなら入れたい場所の後ろのところに<b>を入れて普通に戻す。逆も同じ
-    //     // for(let i = 0; i < boldFirst.length(); ++i){
+    async function txtChange(e){
+      let result = await surroundSpan();
+        document.querySelectorAll('[type=button][data-decoration]').forEach(x=>{
+          x.addEventListener('click',()=>{
+            const decoration=x.dataset["decoration"];
+            const sel= getSelection();
+            if(sel.focusNode!==null){
+              let start=sel.getRangeAt(0).startContainer.parentNode;
+              let end=sel.getRangeAt(0).endContainer.parentNode;
+              if(start.closest('#js-post-content') && end.closest('#js-post-content')){
+                const dom=[...sel.getRangeAt(0).cloneContents().querySelectorAll('span')];
+                const parent=end.parentNode;
+                if(dom[0].textContent==""){
+                  dom.shift();
+                }
+                if(dom[dom.length-1].textContent==""){
+                  dom.pop();
+                }else{
+                  end=end.nextElementSibling;
+                }
+                sel.deleteFromDocument() ;
+                sel.removeAllRanges();
+                dom.forEach(x=>{
+                  x.classList.toggle(decoration);
+                  parent.insertBefore(x,end);
+                });
+              }
+            }
+          });
+        });
+    }
 
-    //     // }
-    //     $("#js-post-content").empty();
-    //     $("#js-post-content").prepend(postText);
-    //     // let newNode = document.createElement('b');
-    //     // newNode.innerHTML = selObj.toString();
-    //     // range.deleteContents();
-    //     // range.insertNode(newNode);
-    //     }
-    $(document).on('click', '#js-strong', function(){
-        changeStrongText();
-    });
+      $(document).on('click','.text-button',async function(e){
+        txtChange(e);
+      });
 
 const getPostContent = ()=>{
     let postText = $('#js-post-content')[0].innerHTML.toString();
@@ -198,22 +154,30 @@ function htmlentities(str){
         name="send"
         form="tweet"
         onclick=" getPostContent(); socketSend();">ツイートする</button>
-        <div id="tweet" class="tweet-form">
+        <div id="tweet" id="js-tweet-form" class="tweet-form">
             <label for="post-content">投稿を入力して下さい</label>
             <div id="js-post-content" class="tweet-textarea"  role="textbox"
             contenteditable="true"
             aria-multiline="true" aria-required="true" aria-autocomplete="list" spellcheck="auto" dir="auto"
-            aria-placeholder="投稿を入力して下さい" name="tweet-input">
-            </div>
+            name="tweet-input"></div>
         </div>
         <p class="tweet-items">
-                <button type="button" class="tweet-item" id="js-strong" ><i class="fas fa-bold"></i></button>
-                <button type="button" class="tweet-item"
-                id="js-italic"><i class="fas fa-italic"></i></button>
-                <button type="button" class="tweet-item" id="js-underline"><i class="fas fa-underline"></i></button>
-                <button type="button" class="tweet-item" id="js-link"><i class="fas fa-link"></i></button>
+                <button type="button" class="tweet-item text-button"
+                id="js-strong" data-decoration="bold" value="bold">
+                  <i class="fas fa-bold" data-decoration="bold"></i>
+                </い>
+                <button type="button" class="tweet-item text-button"
+                id="js-italic" data-decoration="italic" value="italic">
+                  <i class="fas fa-italic" data-decoration="italic"></i>
+                </button>
+                <button type="button" class="tweet-item text-button"
+                id="js-underline" data-decoration="underline" value="underline">
+                  <i class="fas fa-underline" data-decoration="underline"></i>
+                </button>
+                <!-- <button type="button" class="tweet-item" id="js-link"><i class="fas fa-link"></i></button>
                 <button type="button" class="tweet-item" id="js-paperclip"><i class="fas fa-paperclip"></i></button>
-                <button type="button" class="tweet-item" id="js-image"><i class="far fa-image"></i></button>
+                <button type="button" class="tweet-item" id="js-image"><i class="far fa-image"></i></button> -->
+                <small style="color:red">文字を入力後、左のボタンを1度押すと太文字などが反応します。</small>
         </p>
     </div>
     <div class="black-background" id="js-black-bg"></div>
@@ -237,5 +201,5 @@ function htmlentities(str){
     </div>
 </div>
 
-<!-- 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
-私の名前は淀川海都です。\nよろしくお願いします。 -->
+// <!-- 012345<span>6789AB</span>CDEFGHIJKLMNOPQRSTUVWXYZ -->
+// <!-- 私の名前は淀川海都です。\nよろしくお願いします。 -->

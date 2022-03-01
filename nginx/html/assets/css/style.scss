@@ -308,6 +308,9 @@ body {
             border-bottom: 0px;
             resize: none;
             font-size: 1.8rem;
+              .bold{font-weight:bold;}
+              .underline{text-decoration:underline;}
+              .italic{font-style:italic;}
           }
           .tweet-items {
             border: 1px solid;
