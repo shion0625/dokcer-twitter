@@ -4,7 +4,6 @@ use Classes\Login;
   //ログイン状態の場合ログイン後のページにリダイレクト
 fun_require_unlogined_session();
   // if(!empty($_COOKIE['auto_login'])) {
-
   // }
 if (!empty($_POST) && isset($_POST['send'])) {
     //メールアドレスまたはパスワードが送信されて来なかった場合

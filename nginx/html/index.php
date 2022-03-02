@@ -4,12 +4,10 @@
 *
 */
 ini_set("memory_limit", "3072M");
-// echo phpinfo();
 ob_start();
 session_start();
 echo __DIR__;
 require __DIR__ .'/vendor/autoload.php';
-// require_once __DIR__ ."/../../vendor/autoload.php";
 require(__DIR__ . '/function.php');
 
 

@@ -5,10 +5,11 @@
  * @param string $str
  * @return string
  */
-// function fun_h($str)
-// {
-//     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
-// }
+
+function fun_h($str)
+{
+    return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+}
 
 //すでにログインしている場合（ログインページの場合）
 function fun_require_unlogined_session()
