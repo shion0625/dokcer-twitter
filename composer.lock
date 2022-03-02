@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b61470318510f7c07f3f74473c5c0257",
+    "content-hash": "4205a3e2251893b79934a8e19a57ca47",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -2199,6 +2199,51 @@
                 }
             ],
             "time": "2021-12-11T16:25:08+00:00"
+        },
+        {
+            "name": "heroku/heroku-buildpack-php",
+            "version": "v212",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/heroku/heroku-buildpack-php.git",
+                "reference": "8b90c86b7bd15f6a516bb2d8e877cb30cd77b90a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/8b90c86b7bd15f6a516bb2d8e877cb30cd77b90a",
+                "reference": "8b90c86b7bd15f6a516bb2d8e877cb30cd77b90a",
+                "shasum": ""
+            },
+            "bin": [
+                "bin/heroku-php-apache2",
+                "bin/heroku-php-nginx"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Zuelke",
+                    "email": "dz@heroku.com"
+                }
+            ],
+            "description": "Toolkit for starting a PHP application locally, with or without foreman, using the same config for PHP and Apache2/Nginx as on Heroku",
+            "homepage": "https://github.com/heroku/heroku-buildpack-php",
+            "keywords": [
+                "apache",
+                "apache2",
+                "foreman",
+                "heroku",
+                "nginx",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/heroku/heroku-buildpack-php/issues",
+                "source": "https://github.com/heroku/heroku-buildpack-php/tree/v212"
+            },
+            "time": "2022-02-25T17:31:55+00:00"
         },
         {
             "name": "pdepend/pdepend",

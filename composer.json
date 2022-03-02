@@ -15,7 +15,8 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.2",
-        "phpmd/phpmd": "^2.10"
+        "phpmd/phpmd": "^2.10",
+        "heroku/heroku-buildpack-php": "*"
     },
     "autoload" : {
         "psr-4" : {
