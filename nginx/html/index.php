@@ -9,7 +9,7 @@ ob_start();
 session_start();
 echo __DIR__;
 require __DIR__ .'/vendor/autoload.php';
-
+// require_once __DIR__ ."/../../vendor/autoload.php";
 require(__DIR__ . '/function.php');
 
 
