@@ -45,15 +45,36 @@ class Connect extends Pdo
      */
     protected function connectDb():object
     {
-
-        error_reporting(E_ALL & ~E_NOTICE);
-        try {
-            $dbh = new Pdo($this->DSN, $this->USER, $this->PASSWORD);
-            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            print_r("Connect 接続失敗: ".$e->getMessage()."\n");
-            exit();
+        $isLocal = false;////localの時trueに変える。
+        if ($isLocal) {
+            /// local環境の時
+            error_reporting(E_ALL & ~E_NOTICE);
+            try {
+                $dbh = new Pdo($this->DSN, $this->USER, $this->PASSWORD);
+                $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                print_r("Connect 接続失敗: ".$e->getMessage()."\n");
+                exit();
+            }
+            return $dbh;
+        } else {
+            //For Heroku
+            $url = parse_url(getenv('CLEARDB_DATABASE_URL'));
+            $server = $url["host"];
+            $username = $url["user"];
+            $password = $url["pass"];
+            $db = substr($url["path"], 1);
+            $pdo = new PDO(
+                'mysql:host=' . $server . ';dbname=' . $db . ';charset=utf8mb4',
+                $username,
+                $password,
+                [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+                ]
+            );
+            return $pdo;
         }
-        return $dbh;
     }
 }
